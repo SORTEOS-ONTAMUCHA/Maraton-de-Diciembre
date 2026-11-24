@@ -1,138 +1,151 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MARATÓN DE DICIEMBRE | SORTEOS LUIS ONTAMUCHA</title>
-<style>
-:root{--rojo:#b71c1c;--rojo-oscuro:#7f0000;--verde:#1b5e20;--dorado:#f9a825;--dorado-suave:#fff8e1}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f0f4f1;color:#1c1e21}
-.header-navidad{background:linear-gradient(135deg,var(--rojo-oscuro),var(--rojo) 60%,var(--verde));color:#fff;text-align:center;padding:25px 15px 20px;border-bottom:5px solid var(--dorado);margin-bottom:15px;box-shadow:0 3px 10px rgba(0,0,0,.15)}
-.badge-navidad{display:inline-block;background:var(--dorado);color:#1a1a1a;font-weight:800;padding:4px 14px;border-radius:50px;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-.header-navidad h1{color:#fff;margin-bottom:6px;font-size:26px;text-shadow:1px 2px 4px rgba(0,0,0,.3)}
-.header-navidad p{font-size:14px;opacity:.95}
-.container{max-width:600px;margin:0 auto;padding:0 15px 30px}
-.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:15px;box-shadow:0 2px 6px rgba(0,0,0,.08);border-top:4px solid var(--verde)}
-.card.card-roja{border-top-color:var(--rojo)}
-h2{color:var(--rojo);margin-bottom:12px;font-size:19px;border-bottom:2px solid var(--dorado);padding-bottom:6px}
-.btn{background:var(--verde);color:#fff;border:none;padding:14px 20px;border-radius:8px;font-size:16px;font-weight:600;width:100%;cursor:pointer;margin-top:10px}
-.btn-green{background:#25D366;color:#fff}
-.btn-red{background:var(--rojo)}
-.btn-gray{background:#6c757d}
-.btn-orange{background:var(--dorado);color:#1a1a1a;font-weight:700}
-.btn:hover{opacity:.9}
-.btn:disabled{background:#bcc0c4;color:#fff;cursor:not-allowed}
-input,select{width:100%;padding:12px;border:1px solid #cfd8dc;border-radius:6px;font-size:16px;margin:8px 0}
-label{font-weight:600;font-size:14px;color:#455a64}
-.grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin:15px 0;max-height:380px;overflow-y:auto;padding:4px}
-@media(min-width:480px){.grid{grid-template-columns:repeat(10,1fr)}}
-.num{padding:10px 2px;text-align:center;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;user-select:none;background:#e8f5e9;color:var(--verde);border:1px solid #c8e6c9}
-.num:hover{background:#c8e6c9;border-color:var(--verde)}
-.selected{outline:2px solid var(--rojo);background:var(--dorado)!important;color:#1a1a1a!important;border-color:#f57f17!important;transform:scale(1.05)}
-.pago-box{background:#f1f8e9;border-left:4px solid var(--verde);padding:15px;border-radius:8px;margin:10px 0}
-.comprobante{border:2px dashed var(--rojo);padding:16px;text-align:left;background:var(--dorado-suave);border-radius:8px;line-height:1.6}
-.stats{display:flex;justify-content:space-around;text-align:center;margin:15px 0}
-.stat-num{font-size:24px;font-weight:700}
-.copy-btn{background:#e4e6eb;color:#050505;padding:8px 12px;font-size:14px;margin:5px 0}
-.lista-nums{background:var(--dorado-suave);border:1px solid #ffe082;padding:10px;border-radius:6px;margin:10px 0;max-height:120px;overflow-y:auto;font-size:14px;font-weight:700;color:var(--rojo-oscuro)}
-.total-box{background:#e8f5e9;border:2px solid var(--verde);padding:15px;border-radius:8px;text-align:center;margin:15px 0}
-.total-num{font-size:32px;font-weight:700;color:var(--verde)}
-.btn-group{display:flex;gap:10px;margin:10px 0}
-.loading{text-align:center;padding:20px;color:#606770}
-.alerta{background:var(--dorado-suave);border:1px solid var(--dorado);padding:12px;border-radius:6px;margin:10px 0;font-size:14px;color:#6d4c00}
-.fechas-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}
-.fecha-pill{background:#ffffff;border:1.5px solid var(--dorado);color:#1c1e21;padding:10px 8px;border-radius:8px;text-align:center;font-size:13px;font-weight:700}box-shadow: 0 1px 3px rgba(0,0,0,0.06);}
-.suerte-control{display:flex;gap:10px;align-items:center;margin:12px 0}
-.suerte-control input{width:75px;margin:0;text-align:center;font-weight:700}
-.admin-bar{position:fixed;top:12px;right:12px;z-index:9999}
-.hidden { display: none !important; }
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MARATÓN DE DICIEMBRE | SORTEOS LUIS ONTAMUCHA</title>
+  <style>
+    :root {
+      --rojo: #b71c1c;
+      --rojo-oscuro: #7f0000;
+      --verde: #1b5e20;
+      --dorado: #f9a825;
+      --dorado-suave: #fff8e1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f0f4f1; color: #1c1e21; }
+    .header-navidad { background: linear-gradient(135deg, var(--rojo-oscuro), var(--rojo) 60%, var(--verde)); color: #fff; text-align: center; padding: 25px 15px 20px; border-bottom: 5px solid var(--dorado); margin-bottom: 15px; box-shadow: 0 3px 10px rgba(0,0,0,.15); }
+    .badge-navidad { display: inline-block; background: var(--dorado); color: #1a1a1a; font-weight: 800; padding: 4px 14px; border-radius: 50px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .header-navidad h1 { color: #fff; margin-bottom: 6px; font-size: 26px; text-shadow: 1px 2px 4px rgba(0,0,0,.3); }
+    .header-navidad p { font-size: 14px; opacity: .95; }
+    .container { max-width: 600px; margin: 0 auto; padding: 0 15px 30px; }
+    .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,.08); border-top: 4px solid var(--verde); }
+    .card.card-roja { border-top-color: var(--rojo); }
+    h2 { color: var(--rojo); margin-bottom: 12px; font-size: 19px; border-bottom: 2px solid var(--dorado); padding-bottom: 6px; }
+    .btn { background: var(--verde); color: #fff; border: none; padding: 14px 20px; border-radius: 8px; font-size: 16px; font-weight: 600; width: 100%; cursor: pointer; margin-top: 10px; }
+    .btn-green { background: #25D366; color: #fff; }
+    .btn-red { background: var(--rojo); }
+    .btn-gray { background: #6c757d; }
+    .btn-orange { background: var(--dorado); color: #1a1a1a; font-weight: 700; }
+    .btn:hover { opacity: .9; }
+    .btn:disabled { background: #bcc0c4; color: #fff; cursor: not-allowed; }
+    input, select { width: 100%; padding: 12px; border: 1px solid #cfd8dc; border-radius: 6px; font-size: 16px; margin: 8px 0; }
+    label { font-weight: 600; font-size: 14px; color: #455a64; display: block; margin-top: 8px; }
+    .grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin: 15px 0; max-height: 380px; overflow-y: auto; padding: 4px; }
+    @media(min-width: 480px) { .grid { grid-template-columns: repeat(10, 1fr); } }
+    .num { padding: 10px 2px; text-align: center; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; user-select: none; background: #e8f5e9; color: var(--verde); border: 1px solid #c8e6c9; }
+    .num:hover { background: #c8e6c9; border-color: var(--verde); }
+    .selected { outline: 2px solid var(--rojo); background: var(--dorado) !important; color: #1a1a1a !important; border-color: #f57f17 !important; transform: scale(1.05); }
+    .pago-box { background: #f1f8e9; border-left: 4px solid var(--verde); padding: 15px; border-radius: 8px; margin: 10px 0; }
+    .comprobante { border: 2px dashed var(--rojo); padding: 16px; text-align: left; background: var(--dorado-suave); border-radius: 8px; line-height: 1.6; }
+    .copy-btn { background: #e4e6eb; color: #050505; padding: 8px 12px; font-size: 14px; margin: 5px 0; }
+    .lista-nums { background: var(--dorado-suave); border: 1px solid #ffe082; padding: 10px; border-radius: 6px; margin: 10px 0; max-height: 120px; overflow-y: auto; font-size: 14px; font-weight: 700; color: var(--rojo-oscuro); }
+    .total-box { background: #e8f5e9; border: 2px solid var(--verde); padding: 15px; border-radius: 8px; text-align: center; margin: 15px 0; }
+    .total-num { font-size: 32px; font-weight: 700; color: var(--verde); }
+    .btn-group { display: flex; gap: 10px; margin: 10px 0; }
+    .loading { text-align: center; padding: 20px; color: #606770; }
+    .alerta { background: var(--dorado-suave); border: 1px solid var(--dorado); padding: 12px; border-radius: 6px; margin: 10px 0; font-size: 14px; color: #6d4c00; }
+    .fechas-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 12px 0; }
+    .fecha-pill { background: #ffffff; border: 1.5px solid var(--dorado); color: #1c1e21; padding: 10px 8px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .suerte-control { display: flex; gap: 10px; align-items: center; margin: 12px 0; }
+    .suerte-control input { width: 75px; margin: 0; text-align: center; font-weight: 700; }
+    .admin-bar { position: fixed; top: 12px; right: 12px; z-index: 9999; }
+    .hidden { display: none !important; }
+  </style>
 </head>
 <body>
-<div class="admin-bar">
-  <button onclick="abrirMenuPago()" style="background:rgba(255,255,255,.85);border-radius:50%;border:none;font-size:22px;width:38px;height:38px;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,.2)">🔑</button>
-</div>
 
-<div class="header-navidad">
-  <div class="badge-navidad">Edición Especial</div>
-  <h1>✨ MARATÓN DE DICIEMBRE ✨</h1>
-  <p>¡4 eventos con un solo boleto!</p>
-</div>
-
-<div class="container">
-  <div class="card card-roja">
-    <h2>🍀‼️ SORTEOS ONTAMUCHA‼️🍀</h2>
-    <p style="font-size:24px;text-align:center;margin:8px 0;color:var(--verde)"><strong>$10,000 MXN CADA DOMINGO</strong></p>
-    <p style="text-align:center;font-size:15px;margin-bottom:10px">Con tu boleto de <strong>$99 MXN</strong> participas automáticamente en los <strong>4 sorteos</strong>:</p>
-    <div class="fechas-grid">
-      <div class="fecha-pill">🪅 Domingo 6 de Dic </div>
-      <div class="fecha-pill">🕯️ Domingo 13 de Dic </div>
-      <div class="fecha-pill">🎄 Domingo 20 de Dic </div>
-      <div class="fecha-pill">🥂 Domingo 27 de Dic </div>
-    </div>
-    <p style="margin-top:10px"><strong>🍀 El ganador se elige con:</strong> Los 3 últimos dígitos del <strong>Tris Clásico</strong></p>
-    <div class="alerta" style="margin-top:12px">
-      🎁 <strong>‼️BONOS‼️</strong><br>
-      • <strong>$2,000 extras</strong> por comprar 3 boletos o más.<br>
-      • <strong>$1,000 extras</strong> por pago en las primeras dos horas después de que te envío tu boleto.
-    </div>
-    <div class="alerta" style="margin-top:12px">
-      💰 <strong>¡PREMIO ACUMULABLE!</strong> Si el número ganador cae en un boleto <em>no pagado o no vendido</em>, los <strong>$10,000 se acumulan</strong> para el siguiente domingo.
-    </div>
+  <div class="admin-bar">
+    <button onclick="abrirMenuPago()" style="background:rgba(255,255,255,.85);border-radius:50%;border:none;font-size:22px;width:38px;height:38px;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,.2)">🔑</button>
   </div>
 
-  <div class="card">
-    <h2>🎟️ Números Disponibles </h2>
-    <div id="alertaVacio" class="alerta hidden">😔 Por el momento ya no hay números disponibles. ¡Gracias por participar!</div>
-    <div class="suerte-control">
-      <label style="margin:0;flex:1">¿Cuántos boletos al azar?</label>
-      <input type="number" id="cantSuerte" min="1" max="50" value="1">
-      <button class="btn btn-orange" style="margin:0;width:auto;padding:12px 16px" onclick="pruebaTuSuerte()">🎲 Probar suerte</button>
-    </div>
-    <p style="font-size:12px;text-align:center;color:#606770">Solo se muestran números disponibles. Da clic para seleccionar</p>
-    <div id="loadingGrid" class="loading">Cargando boletos...</div>
-    <div class="grid" id="numerosGrid"></div>
-    <div class="btn-group">
-      <button class="btn btn-gray" onclick="limpiarSeleccion()">🗑️ Limpiar selección</button>
-      <button class="btn btn-gray" onclick="cargarNumeros()">🔄 Actualizar</button>
-    </div>
+  <div class="header-navidad">
+    <div class="badge-navidad">Edición Especial</div>
+    <h1>✨ MARATÓN DE DICIEMBRE ✨</h1>
+    <p>¡4 eventos con un solo boleto!</p>
   </div>
 
-  <div class="card card-roja" id="formCard">
-    <h2>✍️ Aparta tus boletos</h2>
-    <label>Números seleccionados:</label>
-    <div class="lista-nums" id="listaSeleccionados">Ninguno seleccionado aún</div>
-    <div class="total-box">
-      <div style="font-size:14px;color:var(--verde);font-weight:700">TOTAL A PAGAR</div>
-      <div class="total-num">$<span id="totalPagar">0</span> MXN</div>
-      <div style="font-size:13px;color:#455a64"><span id="cantBoletos">0</span> boleto(s) × $99 MXN (Válido para los 4 sorteos)</div>
-  </div>
-  <!-- Aviso dinámico de bono -->
-  <div id="avisoBonoVivo" style="margin-top: 8px; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; font-weight: bold; background: #fff8e1; color: #b45309; border: 1px dashed #ffb300;">
-  🎁 Selecciona 3 boletos o más para activar un bono de +$2,000 extras
-  </div>
-
-    <label>Tu nombre completo:</label>
-    <input type="text" id="nombre" placeholder="Juan Pérez" oninput="validarFormulario()">
-    <label>Tu WhatsApp:</label>
-    <input type="tel" id="telefono" placeholder="6421234567" oninput="validarFormulario()">
-    <label>Forma de pago:</label>
-    <select id="formaPago" onchange="mostrarPago()">
-      <option value="">Selecciona...</option>
-      <option value="transfer">Transferencia / Depósito</option>
-      <option value="efectivo">Pago en persona</option>
-    </select>
-    <div id="datosTransfer" class="pago-box hidden">
-      <h3>💳 Datos para transferir</h3>
-      <p><strong>Total:</strong> $<span class="totalMostrar">0</span> MXN</p>
-      <p><strong>Banco:</strong> MERCADO PAGO</p>
-      <p><strong>CLABE:</strong> <span id="clabe">722969014718064659</span></p>
-      <button class="btn copy-btn" type="button" onclick="copiar('clabe')">📋 Copiar CLABE</button>
-      <p><strong>Titular:</strong> LUIS ONTAMUCHA</p>
-      <div class="alerta" style="margin-top:10px">⏰ <strong>IMPORTANTE:</strong> Envía tu comprobante por WhatsApp para confirmar tus boletos antes del sorteo.</div>
+  <div class="container">
+    <div class="card card-roja">
+      <h2>🍀‼️ SORTEOS ONTAMUCHA‼️🍀</h2>
+      <p style="font-size:24px;text-align:center;margin:8px 0;color:var(--verde)"><strong>$10,000 MXN CADA DOMINGO</strong></p>
+      <p style="text-align:center;font-size:15px;margin-bottom:10px">Con tu boleto de <strong>$99 MXN</strong> participas automáticamente en los <strong>4 sorteos</strong>:</p>
+      <div class="fechas-grid">
+        <div class="fecha-pill">🪅 Domingo 6 de Dic</div>
+        <div class="fecha-pill">🕯️ Domingo 13 de Dic</div>
+        <div class="fecha-pill">🎄 Domingo 20 de Dic</div>
+        <div class="fecha-pill">🥂 Domingo 27 de Dic</div>
+      </div>
+      <p style="margin-top:10px"><strong>🍀 El ganador se elige con:</strong> Los 3 últimos dígitos del <strong>Tris Clásico</strong></p>
+      <div class="alerta" style="margin-top:12px">
+        🎁 <strong>‼️BONOS‼️</strong><br>
+        • <strong>$2,000 extras</strong> por comprar 3 boletos o más.<br>
+        • <strong>$1,000 extras</strong> por pago en las primeras dos horas después de que te envío tu boleto.
+      </div>
+      <div class="alerta" style="margin-top:12px">
+        💰 <strong>¡PREMIO ACUMULABLE!</strong> Si el número ganador cae en un boleto <em>no pagado o no vendido</em>, los <strong>$10,000 se acumulan</strong> para el siguiente domingo.
+      </div>
     </div>
+
+    <div class="card">
+      <h2>🎟️ Números Disponibles</h2>
+      <div id="alertaVacio" class="alerta hidden">😔 Por el momento ya no hay números disponibles. ¡Gracias por participar!</div>
+      
+      <div class="suerte-control">
+        <label style="margin:0;flex:1">¿Cuántos boletos al azar?</label>
+        <input type="number" id="cantSuerte" min="1" max="50" value="1">
+        <button class="btn btn-orange" style="margin:0;width:auto;padding:12px 16px" onclick="pruebaTuSuerte()">🎲 Probar suerte</button>
+      </div>
+
+      <input type="text" id="buscadorNum" placeholder="🔍 Buscar número (ej. 007, 450)..." oninput="filtrarGrid()">
+
+      <p style="font-size:12px;text-align:center;color:#606770">Solo se muestran números disponibles. Da clic para seleccionar</p>
+      <div id="loadingGrid" class="loading">Cargando boletos...</div>
+      <div class="grid" id="numerosGrid"></div>
+      
+      <div class="btn-group">
+        <button class="btn btn-gray" onclick="limpiarSeleccion()">🗑️ Limpiar selección</button>
+        <button class="btn btn-gray" onclick="cargarNumeros()">🔄 Actualizar</button>
+      </div>
+    </div>
+
+    <div class="card card-roja" id="formCard">
+      <h2>✍️ Aparta tus boletos</h2>
+      <label>Números seleccionados:</label>
+      <div class="lista-nums" id="listaSeleccionados">Ninguno seleccionado aún</div>
+
+      <div class="total-box">
+        <div style="font-size:14px;color:var(--verde);font-weight:700">TOTAL A PAGAR</div>
+        <div class="total-num">$<span id="totalPagar">0</span> MXN</div>
+        <div style="font-size:13px;color:#455a64"><span id="cantBoletos">0</span> boleto(s) × $99 MXN (Válido para los 4 sorteos)</div>
+        <div id="avisoBonoVivo" style="margin-top: 8px; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; font-weight: bold; background: #fff8e1; color: #b45309; border: 1px dashed #ffb300;">
+          🎁 Selecciona 3 boletos o más para activar un bono de +$2,000 extras
+        </div>
+      </div>
+
+      <label>Tu nombre completo:</label>
+      <input type="text" id="nombre" placeholder="Juan Pérez" oninput="validarFormulario()">
+
+      <label>Tu WhatsApp (10 dígitos):</label>
+      <input type="tel" id="telefono" placeholder="6421234567" oninput="validarFormulario()">
+
+      <label>Forma de pago:</label>
+      <select id="formaPago" onchange="mostrarPago()">
+        <option value="">Selecciona...</option>
+        <option value="transfer">Transferencia / Depósito</option>
+        <option value="efectivo">Pago en persona</option>
+      </select>
+
+      <div id="datosTransfer" class="pago-box hidden">
+        <h3>💳 Datos para transferir</h3>
+        <p><strong>Total:</strong> $<span class="totalMostrar">0</span> MXN</p>
+        <p><strong>Banco:</strong> MERCADO PAGO</p>
+        <p><strong>CLABE:</strong> <span id="clabe">722969014718064659</span></p>
+        <button class="btn copy-btn" type="button" onclick="copiar('clabe')">📋 Copiar CLABE</button>
+        <p><strong>Titular:</strong> LUIS ONTAMUCHA</p>
+        <div class="alerta" style="margin-top:10px">⏰ <strong>IMPORTANTE:</strong> Envía tu comprobante por WhatsApp para confirmar tus boletos antes del sorteo.</div>
+      </div>
+
     <div id="datosEfectivo" class="pago-box hidden">
       <h3>📍 Pago en persona</h3>
       <p><strong>Total:</strong> $<span class="totalMostrar">0</span> MXN</p>
@@ -144,261 +157,249 @@ label{font-weight:600;font-size:14px;color:#455a64}
     <button class="btn btn-red" id="btnApartar" onclick="apartarNumero()" disabled>🌟 Apartar Boletos</button>
   </div>
 
-  <div class="card hidden" id="comprobanteCard">
-    <h2>✅ ¡Boletos Apartados!</h2>
-    <div class="comprobante" id="comprobanteData"></div>
-    <button class="btn btn-green" id="btnWsp">📲 Enviar comprobante por WhatsApp</button>
-    <button class="btn" onclick="window.print()">🖨️ Imprimir / Guardar Comprobante</button>
-    <button class="btn copy-btn" onclick="location.reload()">Apartar más boletos</button>
+ <div class="card hidden" id="comprobanteCard">
+      <h2>✅ ¡Boletos Apartados!</h2>
+      <div class="comprobante" id="comprobanteData"></div>
+      <button class="btn btn-green" id="btnWsp">📲 Enviar comprobante por WhatsApp</button>
+      <button class="btn" onclick="window.print()">🖨️ Imprimir / Guardar Comprobante</button>
+      <button class="btn copy-btn" onclick="location.reload()">Apartar más boletos</button>
+    </div>
   </div>
-</div>
 
-<script>
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzj47Dd28_tOkU6hV41joOaHSWG8fTGfWzrStadtSzNdtRkHjd4nuX7Edtdq_-7wk6mpw/exec';
+  <script>
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzj47Dd28_tOkU6hV41joOaHSWG8fTGfWzrStadtSzNdtRkHjd4nuX7Edtdq_-7wk6mpw/exec';
+    const CONFIG = { precio: 99, whatsappAdmin: '526422201688' };
+    let boletosDisponibles = [];
+    let seleccionados = [];
 
-const CONFIG = {
-  precio: 99,
-  whatsappAdmin: '526422201688'
-};
+    function cargarNumeros() {
+      const loadingEl = document.getElementById('loadingGrid');
+      const gridEl = document.getElementById('numerosGrid');
+      if (loadingEl) loadingEl.classList.remove('hidden');
+      if (gridEl) gridEl.innerHTML = '';
 
-let boletosDisponibles = [];
-let seleccionados = [];
+      const oldScript = document.getElementById('jsonpScript');
+      if (oldScript) oldScript.remove();
 
-function cargarNumeros() {
-  const loadingEl = document.getElementById('loadingGrid');
-  const gridEl = document.getElementById('numerosGrid');
-  if (loadingEl) loadingEl.classList.remove('hidden');
-  if (gridEl) gridEl.innerHTML = '';
-
-  const oldScript = document.getElementById('jsonpScript');
-  if (oldScript) oldScript.remove();
-
-  const script = document.createElement('script');
-  script.id = 'jsonpScript';
-  script.src = SHEET_URL + '?callback=procesarNumeros&t=' + Date.now();
-  script.onerror = function() {
-    if (loadingEl) loadingEl.innerText = 'Error al conectar con el servidor. Intenta actualizar.';
-  };
-  document.body.appendChild(script);
-}
-
-window.procesarNumeros = function(datos) {
-  const loadingEl = document.getElementById('loadingGrid');
-  if (loadingEl) loadingEl.classList.add('hidden');
-  
-  boletosDisponibles = datos
-    .filter(function(item) { return item[1] === 0; })
-    .map(function(item) { return String(item[0]).padStart(3, '0'); });
-
-  const elLibres = document.getElementById('libres');
-  if (elLibres) elLibres.innerText = boletosDisponibles.length;
-
-  const alertaVacio = document.getElementById('alertaVacio');
-  if (alertaVacio) {
-    if (boletosDisponibles.length === 0) {
-      alertaVacio.classList.remove('hidden');
-    } else {
-      alertaVacio.classList.add('hidden');
-    }
-  }
-
-  seleccionados = seleccionados.filter(function(num) {
-    return boletosDisponibles.includes(num);
-  });
-  actualizarResumen();
-  renderGrid(boletosDisponibles);
-};
-
-function renderGrid(lista) {
-  const grid = document.getElementById('numerosGrid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  const fragment = document.createDocumentFragment();
-
-  lista.forEach(function(num) {
-    const div = document.createElement('div');
-    div.className = 'num' + (seleccionados.includes(num) ? ' selected' : '');
-    div.innerText = num;
-    div.onclick = function() { toggleNumero(num, div); };
-    fragment.appendChild(div);
-  });
-
-  grid.appendChild(fragment);
-}
-
-function toggleNumero(num, el) {
-  if (seleccionados.includes(num)) {
-    seleccionados = seleccionados.filter(function(n) { return n !== num; });
-    el.classList.remove('selected');
-  } else {
-    seleccionados.push(num);
-    seleccionados.sort();
-    el.classList.add('selected');
-  }
-  actualizarResumen();
-}
-
-function filtrarGrid() {
-  const buscador = document.getElementById('buscadorNum');
-  const q = buscador ? buscador.value.trim() : '';
-  if (!q) {
-    renderGrid(boletosDisponibles);
-    return;
-  }
-  const filtrados = boletosDisponibles.filter(function(n) { return n.includes(q); });
-  renderGrid(filtrados);
-}
-
-function pruebaTuSuerte() {
-  const cantInput = document.getElementById('cantSuerte');
-  const cant = cantInput ? (parseInt(cantInput.value, 10) || 1) : 1;
-  const noSeleccionados = boletosDisponibles.filter(function(n) {
-    return !seleccionados.includes(n);
-  });
-  
-  if (noSeleccionados.length === 0) {
-    alert('Ya no hay mas boletos disponibles.');
-    return;
-  }
-  
-  const tomar = Math.min(cant, noSeleccionados.length);
-  for (let i = 0; i < tomar; i++) {
-    const idx = Math.floor(Math.random() * noSeleccionados.length);
-    seleccionados.push(noSeleccionados[idx]);
-    noSeleccionados.splice(idx, 1);
-  }
-  seleccionados.sort();
-  actualizarResumen();
-  filtrarGrid();
-}
-
-function limpiarSeleccion() {
-  seleccionados = [];
-  actualizarResumen();
-  filtrarGrid();
-}
-function actualizarResumen() {
-  const listaDiv = document.getElementById('listaSeleccionados');
-  if (listaDiv) {
-    listaDiv.innerText = seleccionados.length > 0 ? seleccionados.join(', ') : 'Ninguno seleccionado aun';
-  }
-
-  const total = seleccionados.length * CONFIG.precio;
-  const cantEl = document.getElementById('cantBoletos');
-  const totalEl = document.getElementById('totalPagar');
-  if (cantEl) cantEl.innerText = seleccionados.length;
-  if (totalEl) totalEl.innerText = total;
-
-  document.querySelectorAll('.totalMostrar').forEach(function(el) {
-    el.innerText = total;
-  });
-
-  const avisoBono = document.getElementById('avisoBonoVivo');
-  if (avisoBono) {
-    const cant = seleccionados.length;
-    if (cant === 0) {
-      avisoBono.style.background = '#fff8e1';
-      avisoBono.style.color = '#b45309';
-      avisoBono.style.borderColor = '#ffb300';
-      avisoBono.innerHTML = '🎁 Selecciona 3 boletos o más para activar un bono de <strong>+$2,000 extras</strong>';
-    } else if (cant < 3) {
-      const faltan = 3 - cant;
-      avisoBono.style.background = '#fff3cd';
-      avisoBono.style.color = '#856404';
-      avisoBono.style.borderColor = '#ffeeba';
-      avisoBono.innerHTML = '🔥 ¡Vas muy bien! Te falta' + (faltan === 1 ? '' : 'n') + ' <strong>' + faltan + ' boleto' + (faltan === 1 ? '' : 's') + '</strong> para ganar el bono de <strong>+$2,000 extras</strong>';
-    } else {
-      avisoBono.style.background = '#dcfce7';
-      avisoBono.style.color = '#15803d';
-      avisoBono.style.borderColor = '#86efac';
-      avisoBono.innerHTML = '✅ <strong>¡BONO +$2,000 EXTRAS ACTIVADO!</strong> (Más +$1,000 extra pagando en 2 hrs)';
-    }
-  }
-
-  validarFormulario();
-}
-
-function mostrarPago() {
-  const forma = document.getElementById('formaPago').value;
-  const transferEl = document.getElementById('datosTransfer');
-  const efectivoEl = document.getElementById('datosEfectivo');
-  if (transferEl) transferEl.classList.toggle('hidden', forma !== 'transfer');
-  if (efectivoEl) efectivoEl.classList.toggle('hidden', forma !== 'efectivo');
-  validarFormulario();
-}
-
-function validarFormulario() {
-  const nombre = document.getElementById('nombre').value.trim();
-  const tel = document.getElementById('telefono').value.trim();
-  const pago = document.getElementById('formaPago').value;
-  const valido = seleccionados.length > 0 && nombre.length >= 3 && tel.replace(/\D/g, '')/length >= 10 && pago !== '';
-  const btn = document.getElementById('btnApartar');
-  if (btn) btn.disabled = !valido;
-}
-
-function copiar(id) {
-  const texto = document.getElementById(id).innerText;
-  navigator.clipboard.writeText(texto).then(function() {
-    alert('CLABE copiada al portapapeles');
-  });
-}
-
-async function apartarNumero() {
-  const btn = document.getElementById('btnApartar');
-  btn.disabled = true;
-  btn.innerText = 'Apartando boletos...';
-
-  const payload = {
-    accion: 'apartar',
-    numeros: seleccionados,
-    nombre: document.getElementById('nombre').value.trim(),
-    telefono: document.getElementById('telefono').value.trim(),
-    formaPago: document.getElementById('formaPago').value
-  };
-
-  try {
-    await fetch(SHEET_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify(payload)
-    });
-
-    const total = seleccionados.length * CONFIG.precio;
-    const numsTexto = seleccionados.join(', ');
-    const horaApartado = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-    const tieneBono3 = seleccionados.length >= 3;
-
-    let bonosHtml = '<hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">';
-    bonosHtml += '<p><strong>🎁 Bonos Activos:</strong></p>';
-    
-    if (tieneBono3) {
-      bonosHtml += '<p style="color:#15803d;">✅ <strong>+$2,000 extras ACTIVO</strong> (3+ boletos)</p>';
-    } else {
-      bonosHtml += '<p style="color:#666;">⚪ Bono +$2,000 inactivo (Aplica desde 3 boletos)</p>';
-    }
-    bonosHtml += '<p style="color:#b45309;">⏳ <strong>+$1,000 extras DISPONIBLE</strong> (Pagando en las primeras 2 hrs tras recibir tu boleto. Registro: ' + horaApartado + ')</p>';
-
-    // Ocultar formulario y mostrar comprobante
-    const formCard = document.getElementById('formCard');
-    const compCard = document.getElementById('comprobanteCard');
-    const compData = document.getElementById('comprobanteData');
-
-    if (formCard) formCard.classList.add('hidden');
-    if (compCard) {
-      compCard.classList.remove('hidden');
-      compCard.scrollIntoView({ behavior: 'smooth' });
+      const script = document.createElement('script');
+      script.id = 'jsonpScript';
+      script.src = SHEET_URL + '?callback=procesarNumeros&t=' + Date.now();
+      script.onerror = function() {
+        if (loadingEl) loadingEl.innerText = 'Error al conectar con el servidor. Intenta actualizar.';
+      };
+      document.body.appendChild(script);
     }
 
-    if (compData) {
-      compData.innerHTML =
-        '<p><strong>Nombre:</strong> ' + payload.nombre + '</p>' +
-        '<p><strong>WhatsApp:</strong> ' + payload.telefono + '</p>' +
-        '<p><strong>Boletos (' + seleccionados.length + '):</strong> ' + numsTexto + '</p>' +
-        '<p><strong>Total a pagar:</strong> $' + total + ' MXN</p>' +
-        '<p><strong>Método:</strong> ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '</p>' +
+    window.procesarNumeros = function(datos) {
+      const loadingEl = document.getElementById('loadingGrid');
+      if (loadingEl) loadingEl.classList.add('hidden');
+
+      boletosDisponibles = datos
+        .filter(function(item) { return item[1] === 0; })
+        .map(function(item) { return String(item[0]).padStart(3, '0'); });
+
+      const elLibres = document.getElementById('libres');
+      if (elLibres) elLibres.innerText = boletosDisponibles.length;
+
+      const alertaVacio = document.getElementById('alertaVacio');
+      if (alertaVacio) {
+        if (boletosDisponibles.length === 0) {
+          alertaVacio.classList.remove('hidden');
+        } else {
+          alertaVacio.classList.add('hidden');
+        }
+      }
+
+      seleccionados = seleccionados.filter(function(num) {
+        return boletosDisponibles.includes(num);
+      });
+
+      actualizarResumen();
+      filtrarGrid();
+    };
+
+    function renderGrid(lista) {
+      const grid = document.getElementById('numerosGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      const fragment = document.createDocumentFragment();
+      lista.forEach(function(num) {
+        const div = document.createElement('div');
+        div.className = 'num' + (seleccionados.includes(num) ? ' selected' : '');
+        div.innerText = num;
+        div.onclick = function() { toggleNumero(num, div); };
+        fragment.appendChild(div);
+      });
+      grid.appendChild(fragment);
+    }
+
+    function toggleNumero(num, el) {
+      if (seleccionados.includes(num)) {
+        seleccionados = seleccionados.filter(function(n) { return n !== num; });
+        el.classList.remove('selected');
+      } else {
+        seleccionados.push(num);
+        seleccionados.sort();
+        el.classList.add('selected');
+      }
+      actualizarResumen();
+    }
+
+    function filtrarGrid() {
+      const buscador = document.getElementById('buscadorNum');
+      const q = buscador ? buscador.value.trim() : '';
+      if (!q) {
+        renderGrid(boletosDisponibles);
+        return;
+      }
+      const filtrados = boletosDisponibles.filter(function(n) { return n.includes(q); });
+      renderGrid(filtrados);
+    }
+
+    function pruebaTuSuerte() {
+      const cantInput = document.getElementById('cantSuerte');
+      const cant = cantInput ? (parseInt(cantInput.value, 10) || 1) : 1;
+      const noSeleccionados = boletosDisponibles.filter(function(n) { return !seleccionados.includes(n); });
+      
+      if (noSeleccionados.length === 0) {
+        alert('Ya no hay más boletos disponibles.');
+        return;
+      }
+      const tomar = Math.min(cant, noSeleccionados.length);
+      for (let i = 0; i < tomar; i++) {
+        const idx = Math.floor(Math.random() * noSeleccionados.length);
+        seleccionados.push(noSeleccionados[idx]);
+        noSeleccionados.splice(idx, 1);
+      }
+      seleccionados.sort();
+      actualizarResumen();
+      filtrarGrid();
+    }
+
+    function limpiarSeleccion() {
+      seleccionados = [];
+      actualizarResumen();
+      filtrarGrid();
+    }
+
+    function actualizarResumen() {
+      const listaDiv = document.getElementById('listaSeleccionados');
+      if (listaDiv) {
+        listaDiv.innerText = seleccionados.length > 0 ? seleccionados.join(', ') : 'Ninguno seleccionado aún';
+      }
+      const total = seleccionados.length * CONFIG.precio;
+      const cantEl = document.getElementById('cantBoletos');
+      const totalEl = document.getElementById('totalPagar');
+      if (cantEl) cantEl.innerText = seleccionados.length;
+      if (totalEl) totalEl.innerText = total;
+
+      document.querySelectorAll('.totalMostrar').forEach(function(el) {
+        el.innerText = total;
+      });
+
+      const avisoBono = document.getElementById('avisoBonoVivo');
+      if (avisoBono) {
+        const cant = seleccionados.length;
+        if (cant === 0) {
+          avisoBono.style.background = '#fff8e1';
+          avisoBono.style.color = '#b45309';
+          avisoBono.style.borderColor = '#ffb300';
+          avisoBono.innerHTML = '🎁 Selecciona 3 boletos o más para activar un bono de <strong>+$2,000 extras</strong>';
+        } else if (cant < 3) {
+          const faltan = 3 - cant;
+          avisoBono.style.background = '#fff3cd';
+          avisoBono.style.color = '#856404';
+          avisoBono.style.borderColor = '#ffeeba';
+          avisoBono.innerHTML = '🔥 ¡Vas muy bien! Te falta' + (faltan === 1 ? '' : 'n') + ' <strong>' + faltan + ' boleto' + (faltan === 1 ? '' : 's') + '</strong> para ganar el bono de <strong>+$2,000 extras</strong>';
+        } else {
+          avisoBono.style.background = '#dcfce7';
+          avisoBono.style.color = '#15803d';
+          avisoBono.style.borderColor = '#86efac';
+          avisoBono.innerHTML = '✅ <strong>¡BONO +$2,000 EXTRAS ACTIVADO!</strong> (Más +$1,000 extra pagando en 2 hrs)';
+        }
+      }
+      validarFormulario();
+    }
+
+    function mostrarPago() {
+      const forma = document.getElementById('formaPago').value;
+      const transferEl = document.getElementById('datosTransfer');
+      const efectivoEl = document.getElementById('datosEfectivo');
+      if (transferEl) transferEl.classList.toggle('hidden', forma !== 'transfer');
+      if (efectivoEl) efectivoEl.classList.toggle('hidden', forma !== 'efectivo');
+      validarFormulario();
+    }
+
+    function validarFormulario() {
+      const nombre = document.getElementById('nombre').value.trim();
+      const telLimpio = document.getElementById('telefono').value.replace(/\D/g, '');
+      const pago = document.getElementById('formaPago').value;
+      const valido = seleccionados.length > 0 && nombre.length >= 3 && telLimpio.length >= 10 && pago !== '';
+      const btn = document.getElementById('btnApartar');
+      if (btn) btn.disabled = !valido;
+    }
+
+    function copiar(id) {
+      const texto = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(texto).then(function() {
+        alert('CLABE copiada al portapapeles');
+      });
+    }
+
+    async function apartarNumero() {
+      const btn = document.getElementById('btnApartar');
+      btn.disabled = true;
+      btn.innerText = 'Apartando boletos...';
+
+      const payload = {
+        accion: 'apartar',
+        numeros: seleccionados,
+        nombre: document.getElementById('nombre').value.trim(),
+        telefono: document.getElementById('telefono').value.trim(),
+        formaPago: document.getElementById('formaPago').value
+      };
+
+      try {
+        await fetch(SHEET_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload)
+        });
+
+        const total = seleccionados.length * CONFIG.precio;
+        const numsTexto = seleccionados.join(', ');
+        const horaApartado = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+        const tieneBono3 = seleccionados.length >= 3;
+
+        let bonosHtml = '<hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">';
+        bonosHtml += '<p><strong>🎁 Bonos Activos:</strong></p>';
+        if (tieneBono3) {
+          bonosHtml += '<p style="color:#15803d;">✅ <strong>+$2,000 extras ACTIVO</strong> (3+ boletos)</p>';
+        } else {
+          bonosHtml += '<p style="color:#666;">⚪ Bono +$2,000 inactivo (Aplica desde 3 boletos)</p>';
+        }
+        bonosHtml += '<p style="color:#b45309;">⏳ <strong>+$1,000 extras DISPONIBLE</strong> (Pagando en las primeras 2 hrs tras recibir tu boleto. Registro: ' + horaApartado + ')</p>';
+
+        const formCard = document.getElementById('formCard');
+        const compCard = document.getElementById('comprobanteCard');
+        const compData = document.getElementById('comprobanteData');
+
+        if (formCard) formCard.classList.add('hidden');
+        if (compCard) {
+          compCard.classList.remove('hidden');
+          compCard.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        if (compData) {
+          compData.innerHTML =
+            '<p><strong>Nombre:</strong> ' + payload.nombre + '</p>' +
+            '<p><strong>WhatsApp:</strong> ' + payload.telefono + '</p>' +
+            '<p><strong>Boletos (' + seleccionados.length + '):</strong> ' + numsTexto + '</p>' +
+            '<p><strong>Total a pagar:</strong> $' + total + ' MXN</p>' +
+            '<p><strong>Método:</strong> ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '</p>' +
         bonosHtml;
-    }
+        }
 
     let bonosWsp = '%0A*🎁 Bonos:*%0A';
     bonosWsp += tieneBono3 ? '✅ +$2,000 extras ACTIVO (3+ boletos)%0A' : '⚪ Bono +$2,000 no aplica (menos de 3 boletos)%0A';
