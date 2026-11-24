@@ -324,10 +324,11 @@ async function apartarNumero() {
       body: JSON.stringify(payload)
     });
 
-    const total = seleccionados.length * CONFIG.precio;
+    const precioBoleto = (typeof CONFIG !== 'undefined' && CONFIG.precio) ? CONFIG.precio : 99;
+    const total = seleccionados.length * precioBoleto;
     const numsTexto = seleccionados.join(', ');
 
-        // Calcular hora exacta del apartado y estado de bonos
+    // Calcular hora exacta del apartado y estado de bonos
     const horaApartado = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
     const tieneBono3 = seleccionados.length >= 3;
 
@@ -341,20 +342,33 @@ async function apartarNumero() {
     }
     bonosHtml += '<p style="color:#b45309;">⏳ <strong>+$1,000 extras DISPONIBLE</strong> (Pagando en las primeras 2 hrs tras recibir tu boleto. Registro: ' + horaApartado + ')</p>';
 
+    // Mostrar el comprobante (forzando display por si la clase CSS falla)
+    const formCard = document.getElementById('formCard');
+    const compCard = document.getElementById('comprobanteCard');
+    const compData = document.getElementById('comprobanteData');
+
+    if (formCard) formCard.style.display = 'none';
+    if (compCard) {
+      compCard.classList.remove('hidden');
+      compCard.style.display = 'block';
+    }
+
+    if (compData) {
+      compData.innerHTML =
+        '<p><strong>Nombre:</strong> ' + payload.nombre + '</p>' +
+        '<p><strong>WhatsApp:</strong> ' + payload.telefono + '</p>' +
+        '<p><strong>Boletos (' + seleccionados.length + '):</strong> ' + numsTexto + '</p>' +
+        '<p><strong>Total a pagar:</strong> $' + total + ' MXN</p>' +
+        '<p><strong>Método:</strong> ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '</p>' +
+        bonosHtml;
+    } else {
+      alert('No se encontró el cuadro comprobanteData en el HTML');
+    }
+
     // Armar texto de bonos para WhatsApp
     let bonosWsp = '%0A*🎁 Bonos:*%0A';
     bonosWsp += tieneBono3 ? '✅ +$2,000 extras ACTIVO (3+ boletos)%0A' : '⚪ Bono +$2,000 no aplica (menos de 3 boletos)%0A';
     bonosWsp += '⏳ +$1,000 extras (Sujeto a pago en 2 hrs - Registro: ' + encodeURIComponent(horaApartado) + ')%0A';
-
-    document.getElementById('formCard').classList.add('hidden');
-    document.getElementById('comprobanteCard').classList.remove('hidden');
-    document.getElementById('comprobanteData').innerHTML =
-      '<p><strong>Nombre:</strong> ' + payload.nombre + '</p>' +
-      '<p><strong>WhatsApp:</strong> ' + payload.telefono + '</p>' +
-      '<p><strong>Boletos (' + seleccionados.length + '):</strong> ' + numsTexto + '</p>' +
-      '<p><strong>Total a pagar:</strong> $' + total + ' MXN</p>' +
-      '<p><strong>Metodo:</strong> ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '</p>' +
-      bonosHtml;
 
     const textoWsp = 'Hola! Aparte boletos para el MARATON DE DICIEMBRE:%0A%0A' +
       'Nombre: ' + encodeURIComponent(payload.nombre) + '%0A' +
@@ -363,12 +377,16 @@ async function apartarNumero() {
       bonosWsp + '%0A' +
       'Aqui envio mi comprobante:';
 
-    document.getElementById('btnWsp').onclick = function() {
-      window.open('https://wa.me/' + CONFIG.whatsappAdmin + '?text=' + textoWsp, '_blank');
-    };
+    const btnWsp = document.getElementById('btnWsp');
+    const wspAdmin = (typeof CONFIG !== 'undefined' && CONFIG.whatsappAdmin) ? CONFIG.whatsappAdmin : '';
+    if (btnWsp) {
+      btnWsp.onclick = function() {
+        window.open('https://wa.me' + wspAdmin + '?text=' + textoWsp, '_blank');
+      };
+    }
 
   } catch (err) {
-    alert('Hubo un error al apartar. Intenta de nuevo.');
+    alert('Error al generar comprobante: ' + err.message);
     btn.disabled = false;
     btn.innerText = 'Apartar Boletos';
   }
