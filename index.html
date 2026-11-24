@@ -176,7 +176,8 @@ window.procesarNumeros = function(datos) {
     .filter(function(item) { return item.at(1) === 0; })
     .map(function(item) { return String(item.at(0)).padStart(3, '0'); });
 
-  document.getElementById('libres').innerText = boletosDisponibles.length;
+  const elLibres = document.getElementById('libres');
+if (elLibres) elLibres.innerText = boletosDisponibles.length;
 
   if (boletosDisponibles.length === 0) {
     document.getElementById('alertaVacio').classList.remove('hidden');
