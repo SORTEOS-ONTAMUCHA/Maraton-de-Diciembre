@@ -166,16 +166,25 @@
     </div>
   </div>
 
-  <script>
-    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyLRzmqzXM1CemnA0VsuD-gqKtK5IHI-dJsSz0puDbadlBkyhdqfkEIwDNSnuxnPHQTUw/exec';
+<script>
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwBLNshyK5fJc0I0r8DRVwTZ91aEAer3lbSnmi20Tz5tWpir6o-XNC-HfP1P-d4ctixBA/exec';
     const CONFIG = { precio: 99, whatsappAdmin: '526422201688' };
     let boletosDisponibles = [];
     let seleccionados = [];
 
+    function escaparHTML(texto) {
+      const div = document.createElement('div');
+      div.textContent = texto;
+      return div.innerHTML;
+    }
+
     function cargarNumeros() {
       const loadingEl = document.getElementById('loadingGrid');
       const gridEl = document.getElementById('numerosGrid');
-      if (loadingEl) loadingEl.classList.remove('hidden');
+      if (loadingEl) {
+        loadingEl.innerText = 'Cargando boletos...';
+        loadingEl.classList.remove('hidden');
+      }
       if (gridEl) gridEl.innerHTML = '';
 
       const oldScript = document.getElementById('jsonpScript');
@@ -342,7 +351,7 @@
     async function apartarNumero() {
       const btn = document.getElementById('btnApartar');
       btn.disabled = true;
-      btn.innerText = 'Apartando boletos...';
+      btn.innerText = 'Verificando disponibilidad...';
 
       const payload = {
         accion: 'apartar',
@@ -352,25 +361,44 @@
         formaPago: document.getElementById('formaPago').value
       };
 
-      const peticionFetch = fetch(SHEET_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        keepalive: true,
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
-
-      const tiempoLimite = new Promise(function(resolve) {
-        setTimeout(resolve, 4000);
-      });
-
       try {
-        await Promise.race([peticionFetch, tiempoLimite]);
-      } catch (e) {
-        console.warn('Aviso de red:', e);
-      }
+        const respuesta = await fetch(SHEET_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
 
-      mostrarComprobanteFinal(payload);
+        const data = await respuesta.json();
+
+        if (!data.ok) {
+          alert('Error: ' + (data.error || 'No se pudo procesar el apartado.'));
+          btn.disabled = false;
+          btn.innerText = '🌟 Apartar Boletos';
+          return;
+        }
+
+        if (data.ocupados && data.ocupados.length > 0) {
+          alert('⚠️ Atención: Alguien ganó los siguientes boletos hace un segundo: ' + data.ocupados.join(', '));
+        }
+
+        if (!data.apartados || data.apartados.length === 0) {
+          alert('Todos los números que elegiste acaban de ser apartados. Selecciona otros.');
+          btn.disabled = false;
+          btn.innerText = '🌟 Apartar Boletos';
+          cargarNumeros();
+          return;
+        }
+
+        seleccionados = data.apartados;
+        mostrarComprobanteFinal(payload);
+        cargarNumeros();
+
+      } catch (e) {
+        console.error('Error al apartar:', e);
+        alert('Hubo un problema de conexión. Por favor actualiza la página para verificar si tus boletos quedaron apartados.');
+        btn.disabled = false;
+        btn.innerText = '🌟 Apartar Boletos';
+      }
     }
 
     function mostrarComprobanteFinal(payload) {
@@ -394,55 +422,67 @@
 
       if (formCard) formCard.classList.add('hidden');
       if (compCard) {
-        compCard.classList.remove('hidden');
-        compCard.scrollIntoView({ behavior: 'smooth' });
-      }
-
-      if (compData) {
-        compData.innerHTML =
-          '<p><strong>Nombre:</strong> ' + payload.nombre + '</p>' +
-          '<p><strong>WhatsApp:</strong> ' + payload.telefono + '</p>' +
-          '<p><strong>Boletos (' + seleccionados.length + '):</strong> ' + numsTexto + '</p>' +
-          '<p><strong>Total a pagar:</strong> $' + total + ' MXN</p>' +
-          '<p><strong>Método:</strong> ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '</p>' +
-          bonosHtml;
-      }
-
-      let bonosWsp = '%0A*🎁 Bonos:*%0A';
-      bonosWsp += tieneBono3 ? '✅ +$2,000 extras ACTIVO (3+ boletos)%0A' : '⚪ Bono +$2,000 no aplica (menos de 3 boletos)%0A';
-      bonosWsp += '⏳ +$1,000 extras (Sujeto a pago en 2 hrs - Registro: ' + encodeURIComponent(horaApartado) + ')%0A';
-
-      const textoWsp = 'Hola! Aparte boletos para el MARATON DE DICIEMBRE:%0A%0A' +
-        'Nombre: ' + encodeURIComponent(payload.nombre) + '%0A' +
-        'Boletos: ' + encodeURIComponent(numsTexto) + '%0A' +
-        'Total: $' + total + ' MXN%0A' +
-         bonosWsp + '%0A' +
-       'Aqui envio mi comprobante:';
-      const btnWsp = document.getElementById('btnWsp');
-      if (btnWsp) {
-        btnWsp.onclick = function() {
-          const dominioWsp = ['https://api', 'whatsapp', 'com/send?phone='].join('.');
-          const urlWhatsApp = dominioWsp + CONFIG.whatsappAdmin + '&text=' + textoWsp;
-          window.open(urlWhatsApp, '_blank');
+compCard.classList.remove('hidden');
+compCard.scrollIntoView({ behavior: 'smooth' });
+}
+if (compData) {
+compData.innerHTML =
+'Nombre: ' + escaparHTML(payload.nombre) + '' +
+'WhatsApp: ' + escaparHTML(payload.telefono) + '' +
+'Boletos (' + seleccionados.length + '): ' + numsTexto + '' +
+'Total a pagar: $' + total + ' MXN' +
+'Método: ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '' +
+bonosHtml;
+}
+let bonosWsp = '\n*🎁 Bonos:*\n';
+bonosWsp += tieneBono3 ? '✅ +$2,000 extras ACTIVO (3+ boletos)\n' : '⚪ Bono +$2,000 no aplica (menos de 3 boletos)\n';
+bonosWsp += '⏳ +$1,000 extras (Sujeto a pago en 2 hrs - Registro: ' + horaApartado + ')\n';
+const mensajeCompleto = 'Hola! Aparte boletos para el MARATON DE DICIEMBRE:\n\n' +
+'Nombre: ' + payload.nombre + '\n' +
+'Boletos: ' + numsTexto + '\n' +
+'Total: $' + total + ' MXN\n' +
+bonosWsp + '\n' +
+'Aqui envio mi comprobante:';
+const btnWsp = document.getElementById('btnWsp');
+if (btnWsp) {
+btnWsp.onclick = function() {
+const dominioWsp = ['https://api', 'whatsapp', 'com/send?phone='].join('.');
+const urlWhatsApp = dominioWsp + CONFIG.whatsappAdmin + '&text=' + encodeURIComponent(mensajeCompleto);
+window.open(urlWhatsApp, '_blank');
 };
 }
 }
 async function abrirMenuPago() {
+const opcion = prompt('PANEL ADMIN:\nEscribe 1 para MARCAR PAGADOS\nEscribe 2 para LIBERAR BOLETOS no pagados');
+if (opcion !== '1' && opcion !== '2') return;
 const clave = prompt('Ingresa la clave de administrador:');
 if (!clave) return;
-const numsStr = prompt('Ingresa los boletos pagados separados por coma (ej: 005, 120):');
+const textoPrompt = opcion === '1'
+? 'Ingresa los boletos PAGADOS separados por coma (ej: 005, 120):'
+: 'Ingresa los boletos a LIBERAR separados por coma (ej: 005, 120):';
+const numsStr = prompt(textoPrompt);
 if (!numsStr) return;
 const numeros = numsStr.split(',').map(function(n) { return n.trim(); }).filter(Boolean);
-await fetch(SHEET_URL, {
+const accion = opcion === '1' ? 'marcarPagado' : 'liberar';
+try {
+const res = await fetch(SHEET_URL, {
 method: 'POST',
-mode: 'no-cors',
-headers: { 'Content-Type': 'text/plain' },
-body: JSON.stringify({ accion: 'marcarPagado', clave: clave, numeros: numeros })
+headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+body: JSON.stringify({ accion: accion, clave: clave, numeros: numeros })
 });
-alert('Solicitud enviada. Actualizando lista...');
+const data = await res.json();
+if (data.ok) {
+alert('✅ ' + data.mensaje);
 cargarNumeros();
+} else {
+alert('❌ Error: ' + data.error);
+}
+} catch (e) {
+alert('❌ Error de conexión con el servidor.');
+}
 }
 document.addEventListener('DOMContentLoaded', cargarNumeros);
+
 </script>
 </body>
 </html>
