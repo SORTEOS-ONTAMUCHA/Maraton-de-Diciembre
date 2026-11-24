@@ -47,6 +47,8 @@ label{font-weight:600;font-size:14px;color:#455a64}
 .suerte-control{display:flex;gap:10px;align-items:center;margin:12px 0}
 .suerte-control input{width:75px;margin:0;text-align:center;font-weight:700}
 .admin-bar{position:fixed;top:12px;right:12px;z-index:9999}
+.hidden { display: none !important; }
+
 </style>
 </head>
 <body>
@@ -377,20 +379,15 @@ async function apartarNumero() {
     }
     bonosHtml += '<p style="color:#b45309;">⏳ <strong>+$1,000 extras DISPONIBLE</strong> (Pagando en las primeras 2 hrs tras recibir tu boleto. Registro: ' + horaApartado + ')</p>';
 
+    // Ocultar formulario y mostrar comprobante
+    const formCard = document.getElementById('formCard');
     const compCard = document.getElementById('comprobanteCard');
     const compData = document.getElementById('comprobanteData');
 
-    // Ocultar el contenedor padre del botón "Apartar Boletos" (funciona sin importar qué ID tenga la tarjeta)
-    const tarjetaFormulario = btn.closest('.card') || document.getElementById('formCard');
-    if (tarjetaFormulario) {
-      tarjetaFormulario.style.display = 'none';
-    }
-
-    // Mostrar el comprobante y llevar la pantalla hacia él
+    if (formCard) formCard.classList.add('hidden');
     if (compCard) {
       compCard.classList.remove('hidden');
-      compCard.style.display = 'block';
-      compCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      compCard.scrollIntoView({ behavior: 'smooth' });
     }
 
     if (compData) {
@@ -422,7 +419,7 @@ async function apartarNumero() {
     }
 
   } catch (err) {
-    alert('Hubo un error al apartar. Intenta de nuevo.');
+    alert('Hubo un error al apartar: ' + err.message);
     btn.disabled = false;
     btn.innerText = 'Apartar Boletos';
   }
