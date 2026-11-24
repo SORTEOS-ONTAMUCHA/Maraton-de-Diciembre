@@ -163,8 +163,10 @@ let boletosDisponibles = [];
 let seleccionados = [];
 
 function cargarNumeros() {
-  document.getElementById('loadingGrid').classList.remove('hidden');
-  document.getElementById('numerosGrid').innerHTML = '';
+  const loadingEl = document.getElementById('loadingGrid');
+  const gridEl = document.getElementById('numerosGrid');
+  if (loadingEl) loadingEl.classList.remove('hidden');
+  if (gridEl) gridEl.innerHTML = '';
 
   const oldScript = document.getElementById('jsonpScript');
   if (oldScript) oldScript.remove();
@@ -173,25 +175,29 @@ function cargarNumeros() {
   script.id = 'jsonpScript';
   script.src = SHEET_URL + '?callback=procesarNumeros&t=' + Date.now();
   script.onerror = function() {
-    document.getElementById('loadingGrid').innerText = 'Error al conectar con el servidor. Intenta actualizar.';
+    if (loadingEl) loadingEl.innerText = 'Error al conectar con el servidor. Intenta actualizar.';
   };
   document.body.appendChild(script);
 }
 
 window.procesarNumeros = function(datos) {
-  document.getElementById('loadingGrid').classList.add('hidden');
+  const loadingEl = document.getElementById('loadingGrid');
+  if (loadingEl) loadingEl.classList.add('hidden');
   
   boletosDisponibles = datos
-    .filter(function(item) { return item.at(1) === 0; })
-    .map(function(item) { return String(item.at(0)).padStart(3, '0'); });
+    .filter(function(item) { return item[1] === 0; })
+    .map(function(item) { return String(item[0]).padStart(3, '0'); });
 
   const elLibres = document.getElementById('libres');
-if (elLibres) elLibres.innerText = boletosDisponibles.length;
+  if (elLibres) elLibres.innerText = boletosDisponibles.length;
 
-  if (boletosDisponibles.length === 0) {
-    document.getElementById('alertaVacio').classList.remove('hidden');
-  } else {
-    document.getElementById('alertaVacio').classList.add('hidden');
+  const alertaVacio = document.getElementById('alertaVacio');
+  if (alertaVacio) {
+    if (boletosDisponibles.length === 0) {
+      alertaVacio.classList.remove('hidden');
+    } else {
+      alertaVacio.classList.add('hidden');
+    }
   }
 
   seleccionados = seleccionados.filter(function(num) {
@@ -203,6 +209,7 @@ if (elLibres) elLibres.innerText = boletosDisponibles.length;
 
 function renderGrid(lista) {
   const grid = document.getElementById('numerosGrid');
+  if (!grid) return;
   grid.innerHTML = '';
   const fragment = document.createDocumentFragment();
 
@@ -230,7 +237,8 @@ function toggleNumero(num, el) {
 }
 
 function filtrarGrid() {
-  const q = document.getElementById('buscadorNum').value.trim();
+  const buscador = document.getElementById('buscadorNum');
+  const q = buscador ? buscador.value.trim() : '';
   if (!q) {
     renderGrid(boletosDisponibles);
     return;
@@ -240,7 +248,8 @@ function filtrarGrid() {
 }
 
 function pruebaTuSuerte() {
-  const cant = parseInt(document.getElementById('cantSuerte').value, 10) || 1;
+  const cantInput = document.getElementById('cantSuerte');
+  const cant = cantInput ? (parseInt(cantInput.value, 10) || 1) : 1;
   const noSeleccionados = boletosDisponibles.filter(function(n) {
     return !seleccionados.includes(n);
   });
@@ -253,7 +262,7 @@ function pruebaTuSuerte() {
   const tomar = Math.min(cant, noSeleccionados.length);
   for (let i = 0; i < tomar; i++) {
     const idx = Math.floor(Math.random() * noSeleccionados.length);
-    seleccionados.push(noSeleccionados.at(idx));
+    seleccionados.push(noSeleccionados[idx]);
     noSeleccionados.splice(idx, 1);
   }
   seleccionados.sort();
@@ -266,25 +275,53 @@ function limpiarSeleccion() {
   actualizarResumen();
   filtrarGrid();
 }
-
 function actualizarResumen() {
   const listaDiv = document.getElementById('listaSeleccionados');
-  listaDiv.innerText = seleccionados.length > 0 ? seleccionados.join(', ') : 'Ninguno seleccionado aun';
+  if (listaDiv) {
+    listaDiv.innerText = seleccionados.length > 0 ? seleccionados.join(', ') : 'Ninguno seleccionado aun';
+  }
 
   const total = seleccionados.length * CONFIG.precio;
-  document.getElementById('cantBoletos').innerText = seleccionados.length;
-  document.getElementById('totalPagar').innerText = total;
+  const cantEl = document.getElementById('cantBoletos');
+  const totalEl = document.getElementById('totalPagar');
+  if (cantEl) cantEl.innerText = seleccionados.length;
+  if (totalEl) totalEl.innerText = total;
+
   document.querySelectorAll('.totalMostrar').forEach(function(el) {
     el.innerText = total;
   });
+
+  const avisoBono = document.getElementById('avisoBonoVivo');
+  if (avisoBono) {
+    const cant = seleccionados.length;
+    if (cant === 0) {
+      avisoBono.style.background = '#fff8e1';
+      avisoBono.style.color = '#b45309';
+      avisoBono.style.borderColor = '#ffb300';
+      avisoBono.innerHTML = '🎁 Selecciona 3 boletos o más para activar un bono de <strong>+$2,000 extras</strong>';
+    } else if (cant < 3) {
+      const faltan = 3 - cant;
+      avisoBono.style.background = '#fff3cd';
+      avisoBono.style.color = '#856404';
+      avisoBono.style.borderColor = '#ffeeba';
+      avisoBono.innerHTML = '🔥 ¡Vas muy bien! Te falta' + (faltan === 1 ? '' : 'n') + ' <strong>' + faltan + ' boleto' + (faltan === 1 ? '' : 's') + '</strong> para ganar el bono de <strong>+$2,000 extras</strong>';
+    } else {
+      avisoBono.style.background = '#dcfce7';
+      avisoBono.style.color = '#15803d';
+      avisoBono.style.borderColor = '#86efac';
+      avisoBono.innerHTML = '✅ <strong>¡BONO +$2,000 EXTRAS ACTIVADO!</strong> (Más +$1,000 extra pagando en 2 hrs)';
+    }
+  }
 
   validarFormulario();
 }
 
 function mostrarPago() {
   const forma = document.getElementById('formaPago').value;
-  document.getElementById('datosTransfer').classList.toggle('hidden', forma !== 'transfer');
-  document.getElementById('datosEfectivo').classList.toggle('hidden', forma !== 'efectivo');
+  const transferEl = document.getElementById('datosTransfer');
+  const efectivoEl = document.getElementById('datosEfectivo');
+  if (transferEl) transferEl.classList.toggle('hidden', forma !== 'transfer');
+  if (efectivoEl) efectivoEl.classList.toggle('hidden', forma !== 'efectivo');
   validarFormulario();
 }
 
@@ -293,7 +330,8 @@ function validarFormulario() {
   const tel = document.getElementById('telefono').value.trim();
   const pago = document.getElementById('formaPago').value;
   const valido = seleccionados.length > 0 && nombre.length >= 3 && tel.length >= 10 && pago !== '';
-  document.getElementById('btnApartar').disabled = !valido;
+  const btn = document.getElementById('btnApartar');
+  if (btn) btn.disabled = !valido;
 }
 
 function copiar(id) {
@@ -324,11 +362,8 @@ async function apartarNumero() {
       body: JSON.stringify(payload)
     });
 
-    const precioBoleto = (typeof CONFIG !== 'undefined' && CONFIG.precio) ? CONFIG.precio : 99;
-    const total = seleccionados.length * precioBoleto;
+    const total = seleccionados.length * CONFIG.precio;
     const numsTexto = seleccionados.join(', ');
-
-    // Calcular hora exacta del apartado y estado de bonos
     const horaApartado = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
     const tieneBono3 = seleccionados.length >= 3;
 
@@ -342,16 +377,12 @@ async function apartarNumero() {
     }
     bonosHtml += '<p style="color:#b45309;">⏳ <strong>+$1,000 extras DISPONIBLE</strong> (Pagando en las primeras 2 hrs tras recibir tu boleto. Registro: ' + horaApartado + ')</p>';
 
-    // Mostrar el comprobante (forzando display por si la clase CSS falla)
     const formCard = document.getElementById('formCard');
     const compCard = document.getElementById('comprobanteCard');
     const compData = document.getElementById('comprobanteData');
 
-    if (formCard) formCard.style.display = 'none';
-    if (compCard) {
-      compCard.classList.remove('hidden');
-      compCard.style.display = 'block';
-    }
+    if (formCard) formCard.classList.add('hidden');
+    if (compCard) compCard.classList.remove('hidden');
 
     if (compData) {
       compData.innerHTML =
@@ -361,11 +392,8 @@ async function apartarNumero() {
         '<p><strong>Total a pagar:</strong> $' + total + ' MXN</p>' +
         '<p><strong>Método:</strong> ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '</p>' +
         bonosHtml;
-    } else {
-      alert('No se encontró el cuadro comprobanteData en el HTML');
     }
 
-    // Armar texto de bonos para WhatsApp
     let bonosWsp = '%0A*🎁 Bonos:*%0A';
     bonosWsp += tieneBono3 ? '✅ +$2,000 extras ACTIVO (3+ boletos)%0A' : '⚪ Bono +$2,000 no aplica (menos de 3 boletos)%0A';
     bonosWsp += '⏳ +$1,000 extras (Sujeto a pago en 2 hrs - Registro: ' + encodeURIComponent(horaApartado) + ')%0A';
@@ -378,15 +406,14 @@ async function apartarNumero() {
       'Aqui envio mi comprobante:';
 
     const btnWsp = document.getElementById('btnWsp');
-    const wspAdmin = (typeof CONFIG !== 'undefined' && CONFIG.whatsappAdmin) ? CONFIG.whatsappAdmin : '';
     if (btnWsp) {
       btnWsp.onclick = function() {
-        window.open('https://wa.me' + wspAdmin + '?text=' + textoWsp, '_blank');
+        window.open('https://wa.me' + CONFIG.whatsappAdmin + '?text=' + textoWsp, '_blank');
       };
     }
 
   } catch (err) {
-    alert('Error al generar comprobante: ' + err.message);
+    alert('Hubo un error al apartar. Intenta de nuevo.');
     btn.disabled = false;
     btn.innerText = 'Apartar Boletos';
   }
@@ -417,4 +444,3 @@ async function abrirMenuPago() {
 
 document.addEventListener('DOMContentLoaded', cargarNumeros);
 </script>
-
