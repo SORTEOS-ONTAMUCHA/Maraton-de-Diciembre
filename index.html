@@ -107,7 +107,11 @@ label{font-weight:600;font-size:14px;color:#455a64}
       <div style="font-size:14px;color:var(--verde);font-weight:700">TOTAL A PAGAR</div>
       <div class="total-num">$<span id="totalPagar">0</span> MXN</div>
       <div style="font-size:13px;color:#455a64"><span id="cantBoletos">0</span> boleto(s) × $99 MXN (Válido para los 4 sorteos)</div>
-    </div>
+  <!-- Aviso dinámico de bono -->
+<div id="avisoBonoVivo" style="margin-top: 8px; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; font-weight: bold; background: #fff8e1; color: #b45309; border: 1px dashed #ffb300;">
+  🎁 Selecciona 3 boletos o más para activar un bono de +$2,000 extras
+</div>
+
     <label>Tu nombre completo:</label>
     <input type="text" id="nombre" placeholder="Juan Pérez" oninput="validarFormulario()">
     <label>Tu WhatsApp:</label>
@@ -148,7 +152,7 @@ label{font-weight:600;font-size:14px;color:#455a64}
 </div>
 
 <script>
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxUnJqVHjaK-KJUcU-HiuN7p1U7vrOeq_4T1q3HTj0zYoQuWqT6fulWNivxE2L5fe-N2A/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzj47Dd28_tOkU6hV41joOaHSWG8fTGfWzrStadtSzNdtRkHjd4nuX7Edtdq_-7wk6mpw/exec';
 
 const CONFIG = {
   precio: 99,
