@@ -147,7 +147,7 @@ const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxUnJqVHjaK-KJUcU-Hiu
 
 const CONFIG = {
   precio: 99,
-  whatsappAdmin: '526422201688'//
+  whatsappAdmin: '526422201688'
 };
 
 let boletosDisponibles = [];
@@ -334,7 +334,7 @@ async function apartarNumero() {
       'Aqui envio mi comprobante:';
 
     document.getElementById('btnWsp').onclick = function() {
-      window.open('https://wa.me' + CONFIG.whatsappAdmin + '?text=' + textoWsp, '_blank');
+      window.open('https://wa.me/' + CONFIG.whatsappAdmin + '?text=' + textoWsp, '_blank');
     };
 
   } catch (err) {
