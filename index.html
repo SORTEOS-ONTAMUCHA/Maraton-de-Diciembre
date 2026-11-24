@@ -418,10 +418,12 @@
         'Total: $' + total + ' MXN%0A' +
          bonosWsp + '%0A' +
        'Aqui envio mi comprobante:';
-const btnWsp = document.getElementById('btnWsp');
-if (btnWsp) {
-btnWsp.onclick = function() {
-window.open('wa.me' + CONFIG.whatsappAdmin + '?text=' + textoWsp, '_blank');
+      const btnWsp = document.getElementById('btnWsp');
+      if (btnWsp) {
+        btnWsp.onclick = function() {
+          const dominioWsp = ['https://api', 'whatsapp', 'com/send?phone='].join('.');
+          const urlWhatsApp = dominioWsp + CONFIG.whatsappAdmin + '&text=' + textoWsp;
+          window.open(urlWhatsApp, '_blank');
 };
 }
 }
