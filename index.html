@@ -79,17 +79,12 @@ label{font-weight:600;font-size:14px;color:#455a64}
 
   <div class="card">
     <h2>🎟️ Números Disponibles </h2>
-    <div class="stats">
-      <div><div class="stat-num" style="color:var(--verde)" id="libres">-</div>Disponibles</div>
-      <div><div class="stat-num" style="color:var(--rojo)" id="total">1000</div>Total Boletos</div>
-    </div>
     <div id="alertaVacio" class="alerta hidden">😔 Por el momento ya no hay números disponibles. ¡Gracias por participar!</div>
     <div class="suerte-control">
       <label style="margin:0;flex:1">¿Cuántos boletos al azar?</label>
       <input type="number" id="cantSuerte" min="1" max="50" value="1">
       <button class="btn btn-orange" style="margin:0;width:auto;padding:12px 16px" onclick="pruebaTuSuerte()">🎲 Probar suerte</button>
     </div>
-    <input type="text" id="buscadorNum" placeholder="🔍 Buscar número (ej. 007, 524)..." maxlength="3" oninput="filtrarGrid()">
     <p style="font-size:12px;text-align:center;color:#606770">Solo se muestran números disponibles. Da clic para seleccionar</p>
     <div id="loadingGrid" class="loading">Cargando boletos...</div>
     <div class="grid" id="numerosGrid"></div>
