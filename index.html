@@ -179,10 +179,10 @@ function cargarNumeros() {
 window.procesarNumeros = function(datos) {
   document.getElementById('loadingGrid').classList.add('hidden');
   
-  // Filtrar solo los que tienen estado === 0 (disponibles) y formatear a 3 dígitos
+  // Filtrar solo los que tienen estado === 0 y formatear el número a 3 dígitos
   boletosDisponibles = datos
-    .filter(item => item[1] === 0)
-    .map(item => String(item[0]).padStart(3, '0'));
+    .filter(item => item.at(1) === 0)
+    .map(item => String(item.at(0)).padStart(3, '0'));
 
   document.getElementById('libres').innerText = boletosDisponibles.length;
 
