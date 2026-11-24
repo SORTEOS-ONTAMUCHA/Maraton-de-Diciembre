@@ -167,7 +167,7 @@
   </div>
 
   <script>
-    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzj47Dd28_tOkU6hV41joOaHSWG8fTGfWzrStadtSzNdtRkHjd4nuX7Edtdq_-7wk6mpw/exec';
+    const SHEET_URL = 'https://google.com';
     const CONFIG = { precio: 99, whatsappAdmin: '526422201688' };
     let boletosDisponibles = [];
     let seleccionados = [];
@@ -198,16 +198,9 @@
         .filter(function(item) { return item[1] === 0; })
         .map(function(item) { return String(item[0]).padStart(3, '0'); });
 
-      const elLibres = document.getElementById('libres');
-      if (elLibres) elLibres.innerText = boletosDisponibles.length;
-
       const alertaVacio = document.getElementById('alertaVacio');
       if (alertaVacio) {
-        if (boletosDisponibles.length === 0) {
-          alertaVacio.classList.remove('hidden');
-        } else {
-          alertaVacio.classList.add('hidden');
-        }
+        alertaVacio.classList.toggle('hidden', boletosDisponibles.length > 0);
       }
 
       seleccionados = seleccionados.filter(function(num) {
@@ -359,96 +352,94 @@
         formaPago: document.getElementById('formaPago').value
       };
 
+      const peticionFetch = fetch(SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        keepalive: true,
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+
+      const tiempoLimite = new Promise(function(resolve) {
+        setTimeout(resolve, 4000);
+      });
+
       try {
-        await fetch(SHEET_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify(payload)
-        });
+        await Promise.race([peticionFetch, tiempoLimite]);
+      } catch (e) {
+        console.warn('Aviso de red:', e);
+      }
 
-        const total = seleccionados.length * CONFIG.precio;
-        const numsTexto = seleccionados.join(', ');
-        const horaApartado = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-        const tieneBono3 = seleccionados.length >= 3;
-
-        let bonosHtml = '<hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">';
-        bonosHtml += '<p><strong>🎁 Bonos Activos:</strong></p>';
-        if (tieneBono3) {
-          bonosHtml += '<p style="color:#15803d;">✅ <strong>+$2,000 extras ACTIVO</strong> (3+ boletos)</p>';
-        } else {
-          bonosHtml += '<p style="color:#666;">⚪ Bono +$2,000 inactivo (Aplica desde 3 boletos)</p>';
-        }
-        bonosHtml += '<p style="color:#b45309;">⏳ <strong>+$1,000 extras DISPONIBLE</strong> (Pagando en las primeras 2 hrs tras recibir tu boleto. Registro: ' + horaApartado + ')</p>';
-
-        const formCard = document.getElementById('formCard');
-        const compCard = document.getElementById('comprobanteCard');
-        const compData = document.getElementById('comprobanteData');
-
-        if (formCard) formCard.classList.add('hidden');
-        if (compCard) {
-          compCard.classList.remove('hidden');
-          compCard.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        if (compData) {
-          compData.innerHTML =
-            '<p><strong>Nombre:</strong> ' + payload.nombre + '</p>' +
-            '<p><strong>WhatsApp:</strong> ' + payload.telefono + '</p>' +
-            '<p><strong>Boletos (' + seleccionados.length + '):</strong> ' + numsTexto + '</p>' +
-            '<p><strong>Total a pagar:</strong> $' + total + ' MXN</p>' +
-            '<p><strong>Método:</strong> ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '</p>' +
-        bonosHtml;
-        }
-
-    let bonosWsp = '%0A*🎁 Bonos:*%0A';
-    bonosWsp += tieneBono3 ? '✅ +$2,000 extras ACTIVO (3+ boletos)%0A' : '⚪ Bono +$2,000 no aplica (menos de 3 boletos)%0A';
-    bonosWsp += '⏳ +$1,000 extras (Sujeto a pago en 2 hrs - Registro: ' + encodeURIComponent(horaApartado) + ')%0A';
-
-    const textoWsp = 'Hola! Aparte boletos para el MARATON DE DICIEMBRE:%0A%0A' +
-      'Nombre: ' + encodeURIComponent(payload.nombre) + '%0A' +
-      'Boletos: ' + encodeURIComponent(numsTexto) + '%0A' +
-      'Total: $' + total + ' MXN%0A' +
-      bonosWsp + '%0A' +
-      'Aqui envio mi comprobante:';
-
-    const btnWsp = document.getElementById('btnWsp');
-    if (btnWsp) {
-      btnWsp.onclick = function() {
-        window.open('https://wa.me/' + CONFIG.whatsappAdmin + '?text=' + textoWsp, '_blank');
-      };
+      mostrarComprobanteFinal(payload);
     }
 
-  } catch (err) {
-    alert('Hubo un error al apartar: ' + err.message);
-    btn.disabled = false;
-    btn.innerText = 'Apartar Boletos';
-  }
-}
+    function mostrarComprobanteFinal(payload) {
+      const total = seleccionados.length * CONFIG.precio;
+      const numsTexto = seleccionados.join(', ');
+      const horaApartado = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+      const tieneBono3 = seleccionados.length >= 3;
 
+      let bonosHtml = '<hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">';
+      bonosHtml += '<p><strong>🎁 Bonos Activos:</strong></p>';
+      if (tieneBono3) {
+        bonosHtml += '<p style="color:#15803d;">✅ <strong>+$2,000 extras ACTIVO</strong> (3+ boletos)</p>';
+      } else {
+        bonosHtml += '<p style="color:#666;">⚪ Bono +$2,000 inactivo (Aplica desde 3 boletos)</p>';
+      }
+      bonosHtml += '<p style="color:#b45309;">⏳ <strong>+$1,000 extras DISPONIBLE</strong> (Pagando en las primeras 2 hrs tras recibir tu boleto. Registro: ' + horaApartado + ')</p>';
+
+      const formCard = document.getElementById('formCard');
+      const compCard = document.getElementById('comprobanteCard');
+      const compData = document.getElementById('comprobanteData');
+
+      if (formCard) formCard.classList.add('hidden');
+      if (compCard) {
+        compCard.classList.remove('hidden');
+        compCard.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      if (compData) {
+        compData.innerHTML =
+          '<p><strong>Nombre:</strong> ' + payload.nombre + '</p>' +
+          '<p><strong>WhatsApp:</strong> ' + payload.telefono + '</p>' +
+          '<p><strong>Boletos (' + seleccionados.length + '):</strong> ' + numsTexto + '</p>' +
+          '<p><strong>Total a pagar:</strong> $' + total + ' MXN</p>' +
+          '<p><strong>Método:</strong> ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '</p>' +
+          bonosHtml;
+      }
+
+      let bonosWsp = '%0A*🎁 Bonos:*%0A';
+      bonosWsp += tieneBono3 ? '✅ +$2,000 extras ACTIVO (3+ boletos)%0A' : '⚪ Bono +$2,000 no aplica (menos de 3 boletos)%0A';
+      bonosWsp += '⏳ +$1,000 extras (Sujeto a pago en 2 hrs - Registro: ' + encodeURIComponent(horaApartado) + ')%0A';
+
+      const textoWsp = 'Hola! Aparte boletos para el MARATON DE DICIEMBRE:%0A%0A' +
+        'Nombre: ' + encodeURIComponent(payload.nombre) + '%0A' +
+        'Boletos: ' + encodeURIComponent(numsTexto) + '%0A' +
+        'Total: $' + total + ' MXN%0A' +
+         bonosWsp + '%0A' +
+       'Aqui envio mi comprobante:';
+const btnWsp = document.getElementById('btnWsp');
+if (btnWsp) {
+btnWsp.onclick = function() {
+window.open('wa.me' + CONFIG.whatsappAdmin + '?text=' + textoWsp, '_blank');
+};
+}
+}
 async function abrirMenuPago() {
-  const clave = prompt('Ingresa la clave de administrador:');
-  if (!clave) return;
-  const numsStr = prompt('Ingresa los boletos pagados separados por coma (ej: 005, 120):');
-  if (!numsStr) return;
-
-  const numeros = numsStr.split(',').map(function(n) { return n.trim(); }).filter(Boolean);
-
-  await fetch(SHEET_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({
-      accion: 'marcarPagado',
-      clave: clave,
-      numeros: numeros
-    })
-  });
-
-  alert('Solicitud enviada. Actualizando lista...');
-  cargarNumeros();
+const clave = prompt('Ingresa la clave de administrador:');
+if (!clave) return;
+const numsStr = prompt('Ingresa los boletos pagados separados por coma (ej: 005, 120):');
+if (!numsStr) return;
+const numeros = numsStr.split(',').map(function(n) { return n.trim(); }).filter(Boolean);
+await fetch(SHEET_URL, {
+method: 'POST',
+mode: 'no-cors',
+headers: { 'Content-Type': 'text/plain' },
+body: JSON.stringify({ accion: 'marcarPagado', clave: clave, numeros: numeros })
+});
+alert('Solicitud enviada. Actualizando lista...');
+cargarNumeros();
 }
-
 document.addEventListener('DOMContentLoaded', cargarNumeros);
 </script>
 </body>
