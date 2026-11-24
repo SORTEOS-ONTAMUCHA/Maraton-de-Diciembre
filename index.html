@@ -151,3 +151,225 @@ label{font-weight:600;font-size:14px;color:#455a64}
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbww9Mc7kgDeubYQqs8hBA166kQOgDakSSou9rH3yDHaDOXyq_9EfNglCXiYKpyDndmrLg/exec';
 
 const CONFIG = {
+  precio: 99,
+  whatsappAdmin: '526421234567' // <-- Cambia por tu número a 12 dígitos (52 + 10 dígitos)
+};
+
+let boletosDisponibles = [];
+let seleccionados = [];
+
+// 1. Cargar boletos usando JSONP
+function cargarNumeros() {
+  document.getElementById('loadingGrid').classList.remove('hidden');
+  document.getElementById('numerosGrid').innerHTML = '';
+
+  const oldScript = document.getElementById('jsonpScript');
+  if (oldScript) oldScript.remove();
+
+  const script = document.createElement('script');
+  script.id = 'jsonpScript';
+  script.src = `${SHEET_URL}?callback=procesarNumeros&t=${Date.now()}`;
+  script.onerror = () => {
+    document.getElementById('loadingGrid').innerText = '❌ Error al conectar con el servidor. Intenta actualizar.';
+  };
+  document.body.appendChild(script);
+}
+
+// 2. Callback global que recibe [[num, estado], ...] desde Apps Script
+window.procesarNumeros = function(datos) {
+  document.getElementById('loadingGrid').classList.add('hidden');
+  
+  // Filtrar solo los que tienen estado === 0 (disponibles) y formatear a 3 dígitos
+  boletosDisponibles = datos
+    .filter(item => item[1] === 0)
+    .map(item => String(item[0]).padStart(3, '0'));
+
+  document.getElementById('libres').innerText = boletosDisponibles.length;
+
+  if (boletosDisponibles.length === 0) {
+    document.getElementById('alertaVacio').classList.remove('hidden');
+  } else {
+    document.getElementById('alertaVacio').classList.add('hidden');
+  }
+
+  // Quitar de seleccionados si alguno ya fue ganado por otra persona
+  seleccionados = seleccionados.filter(num => boletosDisponibles.includes(num));
+  actualizarResumen();
+  renderGrid(boletosDisponibles);
+};
+
+// 3. Pintar la cuadrícula
+function renderGrid(lista) {
+  const grid = document.getElementById('numerosGrid');
+  grid.innerHTML = '';
+  const fragment = document.createDocumentFragment();
+
+  lista.forEach(num => {
+    const div = document.createElement('div');
+    div.className = 'num' + (seleccionados.includes(num) ? ' selected' : '');
+    div.innerText = num;
+    div.onclick = () => toggleNumero(num, div);
+    fragment.appendChild(div);
+  });
+
+  grid.appendChild(fragment);
+}
+
+function toggleNumero(num, el) {
+  if (seleccionados.includes(num)) {
+    seleccionados = seleccionados.filter(n => n !== num);
+    el.classList.remove('selected');
+  } else {
+    seleccionados.push(num);
+    seleccionados.sort();
+    el.classList.add('selected');
+  }
+  actualizarResumen();
+}
+
+function filtrarGrid() {
+  const q = document.getElementById('buscadorNum').value.trim();
+  if (!q) {
+    renderGrid(boletosDisponibles);
+    return;
+  }
+  const filtrados = boletosDisponibles.filter(n => n.includes(q));
+  renderGrid(filtrados);
+}
+
+function pruebaTuSuerte() {
+  const cant = parseInt(document.getElementById('cantSuerte').value, 10) || 1;
+  const noSeleccionados = boletosDisponibles.filter(n => !seleccionados.includes(n));
+  
+  if (noSeleccionados.length === 0) return alert('Ya no hay más boletos disponibles.');
+  
+  const tomar = Math.min(cant, noSeleccionados.length);
+  for (let i = 0; i < tomar; i++) {
+    const idx = Math.floor(Math.random() * noSeleccionados.length);
+    seleccionados.push(noSeleccionados[idx]);
+    noSeleccionados.splice(idx, 1);
+  }
+  seleccionados.sort();
+  actualizarResumen();
+  filtrarGrid();
+}
+
+function limpiarSeleccion() {
+  seleccionados = [];
+  actualizarResumen();
+  filtrarGrid();
+}
+
+function actualizarResumen() {
+  const listaDiv = document.getElementById('listaSeleccionados');
+  listaDiv.innerText = seleccionados.length > 0 ? seleccionados.join(', ') : 'Ninguno seleccionado aún';
+
+  const total = seleccionados.length * CONFIG.precio;
+  document.getElementById('cantBoletos').innerText = seleccionados.length;
+  document.getElementById('totalPagar').innerText = total;
+  document.querySelectorAll('.totalMostrar').forEach(el => el.innerText = total);
+
+  validarFormulario();
+}
+
+function mostrarPago() {
+  const forma = document.getElementById('formaPago').value;
+  document.getElementById('datosTransfer').classList.toggle('hidden', forma !== 'transfer');
+  document.getElementById('datosEfectivo').classList.toggle('hidden', forma !== 'efectivo');
+  validarFormulario();
+}
+
+function validarFormulario() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const tel = document.getElementById('telefono').value.trim();
+  const pago = document.getElementById('formaPago').value;
+  const valido = seleccionados.length > 0 && nombre.length >= 3 && tel.length >= 10 && pago !== '';
+  document.getElementById('btnApartar').disabled = !valido;
+}
+
+function copiar(id) {
+  const texto = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(texto).then(() => alert('¡CLABE copiada al portapapeles!'));
+}
+
+// 4. Enviar apartado por POST
+async function apartarNumero() {
+  const btn = document.getElementById('btnApartar');
+  btn.disabled = true;
+  btn.innerText = '⏳ Apartando boletos...';
+
+  const payload = {
+    accion: 'apartar',
+    numeros: seleccionados,
+    nombre: document.getElementById('nombre').value.trim(),
+    telefono: document.getElementById('telefono').value.trim(),
+    formaPago: document.getElementById('formaPago').value
+  };
+
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+
+    const total = seleccionados.length * CONFIG.precio;
+    const numsTexto = seleccionados.join(', ');
+
+    document.getElementById('formCard').classList.add('hidden');
+    document.getElementById('comprobanteCard').classList.remove('hidden');
+    document.getElementById('comprobanteData').innerHTML = `
+      <p><strong>Nombre:</strong> ${payload.nombre}</p>
+      <p><strong>WhatsApp:</strong> ${payload.telefono}</p>
+      <p><strong>Boletos (${seleccionados.length}):</strong> ${numsTexto}</p>
+      <p><strong>Total a pagar:</strong> $${total} MXN</p>
+      <p><strong>Método:</strong> ${payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo'}</p>
+    `;
+
+    const msgWsp = encodeURIComponent(
+      `¡Hola! Aparté boletos para el *MARATÓN DE DICIEMBRE*:\n\n` +
+      `👤 *Nombre:* ${payload.nombre}\n` +
+      `🎟️ *Boletos:* ${numsTexto}\n` +
+      `💰 *Total:* $${total} MXN\n\n` +
+      `Aquí envío mi comprobante:`
+    );
+    document.getElementById('btnWsp').onclick = () => {
+      window.open(`https://wa.me{CONFIG.whatsappAdmin}?text=${msgWsp}`, '_blank');
+    };
+
+  } catch (err) {
+    alert('Hubo un error al apartar. Intenta de nuevo.');
+    btn.disabled = false;
+    btn.innerText = '🎄 Apartar Boletos';
+  }
+}
+
+// 5. Panel Admin rápido (Botón 🔑)
+async function abrirMenuPago() {
+  const clave = prompt('Ingresa la clave de administrador:');
+  if (!clave) return;
+  const numsStr = prompt('Ingresa los boletos pagados separados por coma (ej: 005, 120):');
+  if (!numsStr) return;
+
+  const numeros = numsStr.split(',').map(n => n.trim()).filter(Boolean);
+
+  await fetch(SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      accion: 'marcarPagado',
+      clave: clave,
+      numeros: numeros
+    })
+  });
+
+  alert('Solicitud enviada. Actualizando lista...');
+  cargarNumeros();
+}
+
+// Iniciar carga al abrir la página
+document.addEventListener('DOMContentLoaded', cargarNumeros);
+</script>
+
