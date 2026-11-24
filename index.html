@@ -323,6 +323,25 @@ async function apartarNumero() {
     const total = seleccionados.length * CONFIG.precio;
     const numsTexto = seleccionados.join(', ');
 
+        // Calcular hora exacta del apartado y estado de bonos
+    const horaApartado = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+    const tieneBono3 = seleccionados.length >= 3;
+
+    let bonosHtml = '<hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">';
+    bonosHtml += '<p><strong>🎁 Bonos Activos:</strong></p>';
+    
+    if (tieneBono3) {
+      bonosHtml += '<p style="color:#15803d;">✅ <strong>+$2,000 extras ACTIVO</strong> (3+ boletos)</p>';
+    } else {
+      bonosHtml += '<p style="color:#666;">⚪ Bono +$2,000 inactivo (Aplica desde 3 boletos)</p>';
+    }
+    bonosHtml += '<p style="color:#b45309;">⏳ <strong>+$1,000 extras DISPONIBLE</strong> (Pagando en las primeras 2 hrs tras recibir tu boleto. Registro: ' + horaApartado + ')</p>';
+
+    // Armar texto de bonos para WhatsApp
+    let bonosWsp = '%0A*🎁 Bonos:*%0A';
+    bonosWsp += tieneBono3 ? '✅ +$2,000 extras ACTIVO (3+ boletos)%0A' : '⚪ Bono +$2,000 no aplica (menos de 3 boletos)%0A';
+    bonosWsp += '⏳ +$1,000 extras (Sujeto a pago en 2 hrs - Registro: ' + encodeURIComponent(horaApartado) + ')%0A';
+
     document.getElementById('formCard').classList.add('hidden');
     document.getElementById('comprobanteCard').classList.remove('hidden');
     document.getElementById('comprobanteData').innerHTML =
@@ -330,12 +349,14 @@ async function apartarNumero() {
       '<p><strong>WhatsApp:</strong> ' + payload.telefono + '</p>' +
       '<p><strong>Boletos (' + seleccionados.length + '):</strong> ' + numsTexto + '</p>' +
       '<p><strong>Total a pagar:</strong> $' + total + ' MXN</p>' +
-      '<p><strong>Metodo:</strong> ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '</p>';
+      '<p><strong>Metodo:</strong> ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '</p>' +
+      bonosHtml;
 
     const textoWsp = 'Hola! Aparte boletos para el MARATON DE DICIEMBRE:%0A%0A' +
       'Nombre: ' + encodeURIComponent(payload.nombre) + '%0A' +
       'Boletos: ' + encodeURIComponent(numsTexto) + '%0A' +
-      'Total: $' + total + ' MXN%0A%0A' +
+      'Total: $' + total + ' MXN%0A' +
+      bonosWsp + '%0A' +
       'Aqui envio mi comprobante:';
 
     document.getElementById('btnWsp').onclick = function() {
