@@ -195,8 +195,8 @@
       if (loadingEl) loadingEl.classList.add('hidden');
 
       boletosDisponibles = datos
-        .filter(function(item) { return item[1] === 0; })
-        .map(function(item) { return String(item[0]).padStart(3, '0'); });
+        .filter(function(item) { return item.at(1) === 0; })
+        .map(function(item) { return String(item(0))).padStart(3, '0'); });
 
       const alertaVacio = document.getElementById('alertaVacio');
       if (alertaVacio) {
