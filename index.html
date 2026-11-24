@@ -377,12 +377,21 @@ async function apartarNumero() {
     }
     bonosHtml += '<p style="color:#b45309;">⏳ <strong>+$1,000 extras DISPONIBLE</strong> (Pagando en las primeras 2 hrs tras recibir tu boleto. Registro: ' + horaApartado + ')</p>';
 
-    const formCard = document.getElementById('formCard');
     const compCard = document.getElementById('comprobanteCard');
     const compData = document.getElementById('comprobanteData');
 
-    if (formCard) formCard.classList.add('hidden');
-    if (compCard) compCard.classList.remove('hidden');
+    // Ocultar el contenedor padre del botón "Apartar Boletos" (funciona sin importar qué ID tenga la tarjeta)
+    const tarjetaFormulario = btn.closest('.card') || document.getElementById('formCard');
+    if (tarjetaFormulario) {
+      tarjetaFormulario.style.display = 'none';
+    }
+
+    // Mostrar el comprobante y llevar la pantalla hacia él
+    if (compCard) {
+      compCard.classList.remove('hidden');
+      compCard.style.display = 'block';
+      compCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
     if (compData) {
       compData.innerHTML =
