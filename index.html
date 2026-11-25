@@ -167,7 +167,7 @@
   </div>
 
 <script>
-    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwBLNshyK5fJc0I0r8DRVwTZ91aEAer3lbSnmi20Tz5tWpir6o-XNC-HfP1P-d4ctixBA/exec';
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxHy8gXj7o3F1Mbe5TJXtq-JsBCWgHoc1vs2txuDfiu6Ro6A9L3OG1HrOJgKRdRb-a8uw/exec';
     const CONFIG = { precio: 99, whatsappAdmin: '526422201688' };
     let boletosDisponibles = [];
     let seleccionados = [];
@@ -390,7 +390,7 @@
         }
 
         seleccionados = data.apartados;
-        mostrarComprobanteFinal(payload);
+        mostrarComprobanteFinal(payload,data);
         cargarNumeros();
 
       } catch (e) {
@@ -401,19 +401,29 @@
       }
     }
 
-    function mostrarComprobanteFinal(payload) {
+     function mostrarComprobanteFinal(payload, respuestaServidor) {
       const total = seleccionados.length * CONFIG.precio;
       const numsTexto = seleccionados.join(', ');
       const horaApartado = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-      const tieneBono3 = seleccionados.length >= 3;
+      
+      // Verifica si tiene 3+ en este pedido O si el servidor detectó 3+ acumulados con su teléfono
+      const totalAcumulado = (respuestaServidor && respuestaServidor.totalBoletosCliente) 
+        ? respuestaServidor.totalBoletosCliente 
+        : seleccionados.length;
+      const tieneBono3 = (respuestaServidor && respuestaServidor.bono3Activo) || seleccionados.length >= 3;
 
       let bonosHtml = '<hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">';
       bonosHtml += '<p><strong>🎁 Bonos Activos:</strong></p>';
+      
       if (tieneBono3) {
-        bonosHtml += '<p style="color:#15803d;">✅ <strong>+$2,000 extras ACTIVO</strong> (3+ boletos)</p>';
+        const notaAcumulado = totalAcumulado > seleccionados.length 
+          ? ' (' + totalAcumulado + ' boletos acumulados con tu número)' 
+          : ' (3+ boletos)';
+        bonosHtml += '<p style="color:#15803d;">✅ <strong>+$2,000 extras ACTIVO</strong>' + notaAcumulado + '</p>';
       } else {
-        bonosHtml += '<p style="color:#666;">⚪ Bono +$2,000 inactivo (Aplica desde 3 boletos)</p>';
+        bonosHtml += '<p style="color:#666;">⚪ Bono +$2,000 inactivo (Llevas ' + totalAcumulado + ' de 3 boletos necesarios)</p>';
       }
+      
       bonosHtml += '<p style="color:#b45309;">⏳ <strong>+$1,000 extras DISPONIBLE</strong> (Pagando en las primeras 2 hrs tras recibir tu boleto. Registro: ' + horaApartado + ')</p>';
 
       const formCard = document.getElementById('formCard');
@@ -422,36 +432,44 @@
 
       if (formCard) formCard.classList.add('hidden');
       if (compCard) {
-compCard.classList.remove('hidden');
-compCard.scrollIntoView({ behavior: 'smooth' });
-}
-if (compData) {
-compData.innerHTML =
-'Nombre: ' + escaparHTML(payload.nombre) + '' +
-'WhatsApp: ' + escaparHTML(payload.telefono) + '' +
-'Boletos (' + seleccionados.length + '): ' + numsTexto + '' +
-'Total a pagar: $' + total + ' MXN' +
-'Método: ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '' +
-bonosHtml;
-}
-let bonosWsp = '\n*🎁 Bonos:*\n';
-bonosWsp += tieneBono3 ? '✅ +$2,000 extras ACTIVO (3+ boletos)\n' : '⚪ Bono +$2,000 no aplica (menos de 3 boletos)\n';
-bonosWsp += '⏳ +$1,000 extras (Sujeto a pago en 2 hrs - Registro: ' + horaApartado + ')\n';
-const mensajeCompleto = 'Hola! Aparte boletos para el MARATON DE DICIEMBRE:\n\n' +
-'Nombre: ' + payload.nombre + '\n' +
-'Boletos: ' + numsTexto + '\n' +
-'Total: $' + total + ' MXN\n' +
-bonosWsp + '\n' +
-'Aqui envio mi comprobante:';
-const btnWsp = document.getElementById('btnWsp');
-if (btnWsp) {
-btnWsp.onclick = function() {
-const dominioWsp = ['https://api', 'whatsapp', 'com/send?phone='].join('.');
-const urlWhatsApp = dominioWsp + CONFIG.whatsappAdmin + '&text=' + encodeURIComponent(mensajeCompleto);
-window.open(urlWhatsApp, '_blank');
-};
-}
-}
+        compCard.classList.remove('hidden');
+        compCard.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      if (compData) {
+        compData.innerHTML =
+          '<p><strong>Nombre:</strong> ' + escaparHTML(payload.nombre) + '</p>' +
+          '<p><strong>WhatsApp:</strong> ' + escaparHTML(payload.telefono) + '</p>' +
+          '<p><strong>Boletos (' + seleccionados.length + '):</strong> ' + numsTexto + '</p>' +
+          '<p><strong>Total a pagar:</strong> $' + total + ' MXN</p>' +
+          '<p><strong>Método:</strong> ' + (payload.formaPago === 'transfer' ? 'Transferencia' : 'Efectivo') + '</p>' +
+          bonosHtml;
+      }
+
+      let bonosWsp = '\n*🎁 Bonos:*\n';
+      if (tieneBono3) {
+        bonosWsp += '✅ +$2,000 extras ACTIVO (' + totalAcumulado + ' boletos acumulados)\n';
+      } else {
+        bonosWsp += '⚪ Bono +$2,000 no aplica (llevas ' + totalAcumulado + ' de 3 boletos)\n';
+      }
+      bonosWsp += '⏳ +$1,000 extras (Sujeto a pago en 2 hrs - Registro: ' + horaApartado + ')\n';
+
+      const mensajeCompleto = 'Hola! Aparte boletos para el MARATON DE DICIEMBRE:\n\n' +
+        'Nombre: ' + payload.nombre + '\n' +
+        'Boletos: ' + numsTexto + '\n' +
+        'Total: $' + total + ' MXN\n' +
+        bonosWsp + '\n' +
+        'Aqui envio mi comprobante:';
+
+      const btnWsp = document.getElementById('btnWsp');
+      if (btnWsp) {
+        btnWsp.onclick = function() {
+          const dominioWsp = ['https://api', 'whatsapp', 'com/send?phone='].join('.');
+          const urlWhatsApp = dominioWsp + CONFIG.whatsappAdmin + '&text=' + encodeURIComponent(mensajeCompleto);
+          window.open(urlWhatsApp, '_blank');
+        };
+      }
+    }
 async function abrirMenuPago() {
 const opcion = prompt('PANEL ADMIN:\nEscribe 1 para MARCAR PAGADOS\nEscribe 2 para LIBERAR BOLETOS no pagados');
 if (opcion !== '1' && opcion !== '2') return;
